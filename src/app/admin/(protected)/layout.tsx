@@ -1,4 +1,5 @@
 import Link from 'next/link';
+export const dynamic = 'force-dynamic';
 import { LayoutDashboard, Code, FolderGit2, FileText, Mail, Settings, ExternalLink } from 'lucide-react';
 import LogoutButton from '@/frontend/components/admin/LogoutButton';
 
