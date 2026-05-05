@@ -117,6 +117,10 @@ export default function SkillsManager() {
     }
   };
 
+  const availablePredefined = PREDEFINED_SKILLS.filter(
+    ps => !skills.find(s => s.name === ps.name && s.id !== editingId)
+  );
+
   const fetchSkills = async () => {
     setLoading(true);
     try {
@@ -188,10 +192,10 @@ export default function SkillsManager() {
                     onChange={e => handleNameChange(e.target.value)} 
                     className={inputCls}
                   >
-                    {!PREDEFINED_SKILLS.find(s => s.name === name) && (
+                    {!availablePredefined.find(s => s.name === name) && (
                       <option value={name}>{name}</option>
                     )}
-                    {PREDEFINED_SKILLS.map(s => (
+                    {availablePredefined.map(s => (
                       <option key={s.name} value={s.name}>{s.name}</option>
                     ))}
                   </select>

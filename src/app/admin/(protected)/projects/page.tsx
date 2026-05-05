@@ -1,9 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Plus, Edit2, Trash2, Save, X, ExternalLink, GitBranch, Star, FolderGit2, UploadCloud } from 'lucide-react';
+import { Plus, Edit2, Trash2, Save, X, ExternalLink, GitBranch, Star, FolderGit2, UploadCloud, Loader2 } from 'lucide-react';
 import Image from 'next/image';
-import { CldUploadWidget } from 'next-cloudinary';
 
 type Project = {
   id: number;
@@ -44,6 +43,7 @@ export default function ProjectsManager() {
   const [githubUrl, setGithubUrl] = useState('');
   const [tags, setTags] = useState('');
   const [featured, setFeatured] = useState(false);
+  const [uploading, setUploading] = useState(false);
 
   const fetchProjects = async () => {
     setLoading(true);
@@ -106,7 +106,7 @@ export default function ProjectsManager() {
               <div className="md:col-span-2"><label className={labelCls}>Title</label><input type="text" required value={title} onChange={e => setTitle(e.target.value)} className={inputCls}/></div>
               <div className="md:col-span-2"><label className={labelCls}>Description</label><textarea required value={description} onChange={e => setDescription(e.target.value)} rows={3} className={inputCls}/></div>
               <div className="md:col-span-2">
-                <label className={labelCls}>Project Image (Cloudinary)</label>
+                <label className={labelCls}>Project Image</label>
                 <div className="flex items-center space-x-4">
                   {imageUrl ? (
                     <div className="relative w-24 h-16 rounded-md overflow-hidden bg-neutral-900 border border-neutral-800">
@@ -121,25 +121,31 @@ export default function ProjectsManager() {
                     </div>
                   ) : null}
                   
-                  <CldUploadWidget 
-                    uploadPreset="portfolio_preset"
-                    onSuccess={(result: any) => {
-                      if (result.info?.secure_url) {
-                        setImageUrl(result.info.secure_url);
-                      }
-                    }}
-                  >
-                    {({ open }) => (
-                      <button
-                        type="button"
-                        onClick={() => open()}
-                        className="flex items-center space-x-2 bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-neutral-300 px-4 py-2 rounded-md transition-colors text-sm"
-                      >
-                        <UploadCloud size={16} />
-                        <span>{imageUrl ? 'Change Image' : 'Upload Image'}</span>
-                      </button>
-                    )}
-                  </CldUploadWidget>
+                  <label className="flex items-center space-x-2 bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-neutral-300 px-4 py-2 rounded-md cursor-pointer transition-colors text-sm">
+                    {uploading ? <Loader2 size={16} className="animate-spin" /> : <UploadCloud size={16} />}
+                    <span>{imageUrl ? 'Change Image' : 'Upload Image'}</span>
+                    <input 
+                      type="file" 
+                      className="hidden" 
+                      accept="image/*" 
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        setUploading(true);
+                        const formData = new FormData();
+                        formData.append('file', file);
+                        try {
+                          const res = await fetch('/api/admin/upload', { method: 'POST', body: formData });
+                          if (res.ok) {
+                            const data = await res.json();
+                            setImageUrl(data.url);
+                          }
+                        } catch (err) { console.error(err); }
+                        setUploading(false);
+                      }}
+                      disabled={uploading}
+                    />
+                  </label>
                 </div>
               </div>
               <div><label className={labelCls}>Live URL</label><input type="text" value={liveUrl} onChange={e => setLiveUrl(e.target.value)} className={inputCls}/></div>

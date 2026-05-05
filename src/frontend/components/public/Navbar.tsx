@@ -18,14 +18,26 @@ const navLinks = [
 export default function Navbar({ logoText = "KG." }: { logoText?: string }) {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [activeHash, setActiveHash] = useState('');
   const pathname = usePathname();
 
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 20);
     };
+    const handleHashChange = () => {
+      setActiveHash(window.location.hash);
+    };
+    
     window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener('hashchange', handleHashChange);
+    // Initial check
+    handleHashChange();
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('hashchange', handleHashChange);
+    };
   }, []);
 
   const { theme, setTheme } = useTheme();
@@ -64,6 +76,8 @@ export default function Navbar({ logoText = "KG." }: { logoText?: string }) {
   // Close menu when clicking a link
   const closeMenu = () => setIsOpen(false);
 
+  if (pathname.startsWith('/admin')) return null;
+
   return (
     <nav 
       className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-300 ${
@@ -82,7 +96,7 @@ export default function Navbar({ logoText = "KG." }: { logoText?: string }) {
               key={link.name} 
               href={link.href}
               className={`text-sm font-medium transition-colors hover:text-foreground ${
-                pathname === link.href ? 'text-foreground' : 'text-muted'
+                pathname === link.href || (pathname === '/' && link.href.startsWith('/#') && activeHash === link.href.substring(1)) ? 'text-foreground' : 'text-muted'
               }`}
             >
               {link.name}
@@ -135,7 +149,7 @@ export default function Navbar({ logoText = "KG." }: { logoText?: string }) {
                   href={link.href}
                   onClick={closeMenu}
                   className={`text-lg font-medium transition-colors hover:text-foreground ${
-                    pathname === link.href ? 'text-foreground' : 'text-muted'
+                    pathname === link.href || (pathname === '/' && link.href.startsWith('/#') && activeHash === link.href.substring(1)) ? 'text-foreground' : 'text-muted'
                   }`}
                 >
                   {link.name}

@@ -4,6 +4,7 @@ import { Analytics } from "@vercel/analytics/react";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import "./globals.css";
 import Navbar from "@/frontend/components/public/Navbar";
+import Footer from "@/frontend/components/public/Footer";
 import { ThemeProvider } from "@/frontend/components/providers/ThemeProvider";
 import prisma from "@/backend/db/prisma";
 
@@ -12,42 +13,64 @@ const inter = Inter({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "Keshav Ghai | Professional Portfolio",
-  description: "Full-Stack Engineer with AI Integration",
-  openGraph: {
-    title: "Keshav Ghai | Professional Portfolio",
-    description: "Full-Stack Engineer with AI Integration",
-    url: "https://keshavghai.com",
-    siteName: "Keshav Ghai Portfolio",
-    images: [
-      {
-        url: "/og-image.png",
-        width: 1200,
-        height: 630,
-      },
-    ],
-    locale: "en_US",
-    type: "website",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Keshav Ghai | Professional Portfolio",
-    description: "Senior Full-Stack Engineer and 3D UI Developer",
-    images: ["/og-image.png"],
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  let settingsMap: Record<string, string> = {};
+  try {
+    const settings = await prisma.siteSettings.findMany();
+    settingsMap = settings.reduce((acc, curr) => {
+      acc[curr.key] = curr.value;
+      return acc;
+    }, {} as Record<string, string>);
+  } catch (error) {
+    console.error("Failed to fetch site settings for metadata:", error);
+  }
+
+  const name = settingsMap.name || "Keshav Ghai";
+  const title = settingsMap.site_title || `${name} | Professional Portfolio`;
+  const description = settingsMap.site_description || "Full-Stack Engineer with AI Integration";
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      url: "https://keshavghai.com",
+      siteName: `${name} Portfolio`,
+      images: [
+        {
+          url: "/og-image.png",
+          width: 1200,
+          height: 630,
+        },
+      ],
+      locale: "en_US",
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: ["/og-image.png"],
+    },
+  };
+}
 
 export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const settings = await prisma.siteSettings.findMany();
-  const settingsMap = settings.reduce((acc, curr) => {
-    acc[curr.key] = curr.value;
-    return acc;
-  }, {} as Record<string, string>);
+  let settingsMap: Record<string, string> = {};
+  try {
+    const settings = await prisma.siteSettings.findMany();
+    settingsMap = settings.reduce((acc, curr) => {
+      acc[curr.key] = curr.value;
+      return acc;
+    }, {} as Record<string, string>);
+  } catch (error) {
+    console.error("Failed to fetch site settings for layout:", error);
+  }
 
   const name = settingsMap.name || "Keshav Ghai";
   const logoSetting = settingsMap.logo_text;
@@ -67,6 +90,7 @@ export default async function RootLayout({
           <main className="flex-grow">
             {children}
           </main>
+          <Footer settings={settingsMap} />
           <Analytics />
           <GoogleAnalytics gaId="G-XXXXXXXXXX" />
         </ThemeProvider>

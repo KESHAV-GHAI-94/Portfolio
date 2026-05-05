@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { LayoutDashboard, Code, FolderGit2, FileText, Mail, Settings } from 'lucide-react';
+import { LayoutDashboard, Code, FolderGit2, FileText, Mail, Settings, ExternalLink } from 'lucide-react';
 import LogoutButton from '@/frontend/components/admin/LogoutButton';
 
 const navItems = [
@@ -37,6 +37,17 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </Link>
           ))}
         </nav>
+
+        {/* Links */}
+        <div className="px-3 py-2 border-t border-neutral-900">
+          <Link
+            href="/"
+            className="flex items-center space-x-3 px-3 py-2.5 rounded-md text-neutral-400 hover:text-white hover:bg-neutral-900 transition-colors text-sm font-medium"
+          >
+            <ExternalLink size={17} />
+            <span>View Site</span>
+          </Link>
+        </div>
 
         {/* Logout */}
         <div className="px-3 py-4 border-t border-neutral-900">
