@@ -41,10 +41,12 @@ export default function About(props: AboutProps) {
             transition={{ duration: 0.5 }}
             className="space-y-6"
           >
-            <h3 className="text-xl font-medium text-foreground mb-4 leading-snug">
-              {heading}
-            </h3>
-            <div className="space-y-4 text-muted font-light leading-relaxed whitespace-pre-line">
+            {heading && heading !== text && (
+              <h3 className="text-xl font-medium text-white mb-4 leading-snug">
+                {heading}
+              </h3>
+            )}
+            <div className="space-y-4 text-neutral-400 font-light leading-relaxed whitespace-pre-line">
               {text}
             </div>
             

@@ -90,11 +90,9 @@ export default function SkillList({ skills }: { skills: Skill[] }) {
       </div>
       
       {/* 3D Globe Section */}
-      {!isMobile && (
-        <div className="hidden lg:flex lg:w-[55%] h-[550px] items-center justify-center relative">
-          <SkillGlobe skills={skills} />
-        </div>
-      )}
+      <div className="w-full lg:w-[55%] h-[400px] md:h-[550px] items-center justify-center relative flex">
+        <SkillGlobe skills={skills} />
+      </div>
     </div>
   );
 }
