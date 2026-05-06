@@ -6,10 +6,81 @@ import { Send, CheckCircle, AlertCircle } from 'lucide-react';
 
 export default function ContactForm({ email, isModal = false }: { email?: string; isModal?: boolean }) {
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
+  const [errors, setErrors] = useState({ name: '', email: '', message: '' });
+  const [touched, setTouched] = useState({ name: false, email: false, message: false });
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+
+  const validateEmail = (email: string) => {
+    // Enhanced regex for real email addresses
+    const re = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+    
+    if (!re.test(email)) return false;
+    
+    // Additional "real email" checks
+    const parts = email.split('@');
+    if (parts.length !== 2) return false;
+    
+    const domain = parts[1];
+    // Must have at least one dot and a TLD of at least 2 characters
+    const domainParts = domain.split('.');
+    if (domainParts.length < 2) return false;
+    if (domainParts[domainParts.length - 1].length < 2) return false;
+    
+    // Check for common typos/spam patterns (optional but makes it "fuller")
+    const commonDisposable = ['test.com', 'example.com', 'tempmail.com', 'mailinator.com'];
+    if (commonDisposable.includes(domain.toLowerCase())) return false;
+
+    return true;
+  };
+
+  const validateField = (name: string, value: string) => {
+    let error = '';
+    if (name === 'name') {
+      if (!value.trim()) error = 'Name is required';
+      else if (value.trim().length < 2) error = 'Name must be at least 2 characters';
+    } else if (name === 'email') {
+      if (!value.trim()) error = 'Email is required';
+      else if (!validateEmail(value)) error = 'Please enter a valid "real" email address';
+    } else if (name === 'message') {
+      if (!value.trim()) error = 'Message is required';
+      else if (value.trim().length < 10) error = 'Message must be at least 10 characters';
+    }
+    return error;
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { id, value } = e.target;
+    setFormData(prev => ({ ...prev, [id]: value }));
+    
+    // For immediate feedback while typing
+    const error = validateField(id, value);
+    setErrors(prev => ({ ...prev, [id]: error }));
+  };
+
+  const handleBlur = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { id, value } = e.target;
+    setTouched(prev => ({ ...prev, [id]: true }));
+    const error = validateField(id, value);
+    setErrors(prev => ({ ...prev, [id]: error }));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate all fields before submission
+    const newErrors = {
+      name: validateField('name', formData.name),
+      email: validateField('email', formData.email),
+      message: validateField('message', formData.message),
+    };
+    
+    setErrors(newErrors);
+    setTouched({ name: true, email: true, message: true });
+
+    if (Object.values(newErrors).some(err => err !== '')) {
+      return;
+    }
+
     setStatus('loading');
     
     try {
@@ -67,22 +138,68 @@ export default function ContactForm({ email, isModal = false }: { email?: string
                   type="text"
                   required
                   value={formData.name}
-                  onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                  className="w-full px-8 py-5 bg-foreground/5 border border-border rounded-full focus:outline-none focus:border-foreground/30 focus:ring-1 focus:ring-foreground/30 transition-all text-foreground placeholder-muted/40 font-light"
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  className={`w-full px-8 py-5 bg-foreground/5 border ${touched.name && errors.name ? 'border-red-500/50 focus:border-red-500/70 focus:ring-red-500/30' : 'border-border focus:border-foreground/30 focus:ring-foreground/30'} rounded-full focus:outline-none focus:ring-1 transition-all text-foreground placeholder-muted/40 font-light`}
                   placeholder="John Doe"
                 />
+                {touched.name && errors.name && (
+                  <motion.p 
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    className="text-[11px] text-red-500/80 px-6 font-medium"
+                  >
+                    {errors.name}
+                  </motion.p>
+                )}
               </div>
               <div className="space-y-2">
                 <label htmlFor="email" className="text-[10px] uppercase tracking-widest font-bold text-muted/60 px-6">Email</label>
-                <input
-                  id="email"
-                  type="email"
-                  required
-                  value={formData.email}
-                  onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                  className="w-full px-8 py-5 bg-foreground/5 border border-border rounded-full focus:outline-none focus:border-foreground/30 focus:ring-1 focus:ring-foreground/30 transition-all text-foreground placeholder-muted/40 font-light"
-                  placeholder="john@example.com"
-                />
+                <div className="relative group">
+                  <input
+                    id="email"
+                    type="email"
+                    required
+                    value={formData.email}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    className={`w-full px-8 py-5 bg-foreground/5 border ${
+                      touched.email && errors.email 
+                        ? 'border-red-500/50 focus:border-red-500/70 focus:ring-red-500/30' 
+                        : touched.email && !errors.email && formData.email
+                          ? 'border-green-500/50 focus:border-green-500/70 focus:ring-green-500/30'
+                          : 'border-border focus:border-foreground/30 focus:ring-foreground/30'
+                    } rounded-full focus:outline-none focus:ring-1 transition-all text-foreground placeholder-muted/40 font-light`}
+                    placeholder="john@example.com"
+                  />
+                  {touched.email && !errors.email && formData.email && (
+                    <motion.div 
+                      initial={{ scale: 0, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      className="absolute right-6 top-1/2 -translate-y-1/2"
+                    >
+                      <CheckCircle className="w-5 h-5 text-green-500/80" />
+                    </motion.div>
+                  )}
+                </div>
+                {touched.email && errors.email && (
+                  <motion.p 
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    className="text-[11px] text-red-500/80 px-6 font-medium"
+                  >
+                    {errors.email}
+                  </motion.p>
+                )}
+                {touched.email && !errors.email && formData.email && (
+                  <motion.p 
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    className="text-[11px] text-green-500/80 px-6 font-medium"
+                  >
+                    Email looks good!
+                  </motion.p>
+                )}
               </div>
             </div>
             
@@ -93,10 +210,20 @@ export default function ContactForm({ email, isModal = false }: { email?: string
                 required
                 rows={6}
                 value={formData.message}
-                onChange={(e) => setFormData(prev => ({ ...prev, message: e.target.value }))}
-                className="w-full px-8 py-8 bg-foreground/5 border border-border rounded-[2rem] focus:outline-none focus:border-foreground/30 focus:ring-1 focus:ring-foreground/30 transition-all text-foreground placeholder-muted/40 font-light resize-none"
+                onChange={handleChange}
+                onBlur={handleBlur}
+                className={`w-full px-8 py-8 bg-foreground/5 border ${touched.message && errors.message ? 'border-red-500/50 focus:border-red-500/70 focus:ring-red-500/30' : 'border-border focus:border-foreground/30 focus:ring-foreground/30'} rounded-[2rem] focus:outline-none focus:ring-1 transition-all text-foreground placeholder-muted/40 font-light resize-none`}
                 placeholder="Tell me about your project..."
               />
+              {touched.message && errors.message && (
+                <motion.p 
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  className="text-[11px] text-red-500/80 px-6 font-medium"
+                >
+                  {errors.message}
+                </motion.p>
+              )}
             </div>
 
             {status === 'error' && (
