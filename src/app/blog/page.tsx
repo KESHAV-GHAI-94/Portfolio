@@ -1,5 +1,11 @@
 import prisma from "@/backend/db/prisma";
 import BlogList from "@/frontend/components/public/BlogList";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Blog | Insights on Engineering & 3D UI",
+  description: "Read my latest thoughts on software engineering, creative development, and building high-performance digital products.",
+};
 
 export const revalidate = 3600;
 

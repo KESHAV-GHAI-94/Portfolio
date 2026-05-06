@@ -16,9 +16,9 @@ type HeroProps = {
 
 export default function Hero({ name, badgeText, occupationTitle, bio }: HeroProps) {
   const displayName = name || "Keshav Ghai";
-  const subtitle = occupationTitle || "Senior Full-Stack Engineer & 3D UI Developer";
-  const displayBadge = badgeText || "Available for new opportunities";
-  const displayBio = bio || "Building exceptional digital experiences that seamlessly blend robust backend architecture with refined, highly interactive interfaces.";
+  const subtitle = occupationTitle || "Software Engineer & AI Integration Specialist";
+  const displayBadge = badgeText || "Available for AI & Full-Stack Projects";
+  const displayBio = bio || "Building high-performance digital experiences that bridge the gap between robust Software Engineering and cutting-edge Artificial Intelligence integration.";
   
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20 bg-background transition-colors duration-500">

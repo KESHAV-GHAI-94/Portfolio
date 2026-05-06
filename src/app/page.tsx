@@ -38,8 +38,18 @@ export default async function Home() {
     "@type": "Person",
     "name": name,
     "url": baseUrl,
-    "jobTitle": settingsMap.occupation_title || "Full-Stack Engineer",
+    "jobTitle": settingsMap.occupation_title || "Software Engineer & AI Specialist",
     "description": settingsMap.bio || settingsMap.site_description,
+    "knowsAbout": [
+      "Artificial Intelligence",
+      "Software Engineering",
+      "Full-Stack Development",
+      "Machine Learning Integration",
+      "Next.js",
+      "TypeScript",
+      "3D Web Design"
+    ],
+    "knowsLanguage": ["English", "Hindi"],
     "sameAs": [
       settingsMap.github_url,
       settingsMap.linkedin_url,

@@ -45,6 +45,7 @@ export async function generateMetadata(): Promise<Metadata> {
       "TypeScript",
       "AI Integration",
       "Portfolio",
+      "Portfolio",
       "Software Engineer",
       name,
     ],
@@ -118,7 +119,7 @@ export default async function RootLayout({
   const name = settingsMap.name || "Keshav Ghai";
   const logoSetting = settingsMap.logo_text;
   const gaId = process.env.NEXT_PUBLIC_GA_ID;
-  
+
   // Use logo_text setting if available, otherwise derive initials
   const initials = logoSetting || (name
     .split(' ')
