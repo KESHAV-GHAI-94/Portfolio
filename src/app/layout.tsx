@@ -29,20 +29,47 @@ export async function generateMetadata(): Promise<Metadata> {
   const name = settingsMap.name || "Keshav Ghai";
   const title = settingsMap.site_title || `${name} | Professional Portfolio`;
   const description = settingsMap.site_description || "Full-Stack Engineer with AI Integration";
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://keshavghai.com";
 
   return {
-    title,
+    metadataBase: new URL(baseUrl),
+    title: {
+      default: title,
+      template: `%s | ${name}`,
+    },
     description,
+    keywords: [
+      "Full-Stack Engineer",
+      "React Developer",
+      "Next.js",
+      "TypeScript",
+      "AI Integration",
+      "Portfolio",
+      "Software Engineer",
+      name,
+    ],
+    authors: [{ name: name, url: baseUrl }],
+    creator: name,
+    publisher: name,
+    formatDetection: {
+      email: false,
+      address: false,
+      telephone: false,
+    },
+    alternates: {
+      canonical: "/",
+    },
     openGraph: {
       title,
       description,
-      url: "https://keshavghai.com",
+      url: baseUrl,
       siteName: `${name} Portfolio`,
       images: [
         {
           url: "/og-image.png",
           width: 1200,
           height: 630,
+          alt: `${name} Portfolio Preview`,
         },
       ],
       locale: "en_US",
@@ -53,6 +80,21 @@ export async function generateMetadata(): Promise<Metadata> {
       title,
       description,
       images: ["/og-image.png"],
+      creator: "@keshavghai", // Fallback, ideally from settings
+    },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        "max-video-preview": -1,
+        "max-image-preview": "large",
+        "max-snippet": -1,
+      },
+    },
+    verification: {
+      google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
     },
   };
 }
@@ -75,6 +117,7 @@ export default async function RootLayout({
 
   const name = settingsMap.name || "Keshav Ghai";
   const logoSetting = settingsMap.logo_text;
+  const gaId = process.env.NEXT_PUBLIC_GA_ID;
   
   // Use logo_text setting if available, otherwise derive initials
   const initials = logoSetting || (name
@@ -93,7 +136,7 @@ export default async function RootLayout({
           </main>
           <Footer settings={settingsMap} />
           <Analytics />
-          <GoogleAnalytics gaId="G-XXXXXXXXXX" />
+          {gaId && <GoogleAnalytics gaId={gaId} />}
         </ThemeProvider>
       </body>
     </html>
