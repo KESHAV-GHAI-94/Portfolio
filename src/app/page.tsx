@@ -53,49 +53,6 @@ export default async function Home() {
         <Projects />
         <ContactForm email={settingsMap.email_address} />
 
-        <footer className="py-20 relative z-10 bg-background transition-colors duration-500 overflow-hidden">
-          <div className="section-divider absolute top-0 left-0" />
-
-          <div className="container mx-auto px-6 max-w-5xl">
-            <div className="flex flex-col items-center space-y-12">
-              <Link href="/" className="text-2xl font-black tracking-tighter text-gradient">
-                {settingsMap.logo_text || (settingsMap.name ? settingsMap.name.split(' ').map(n => n[0]).join('').toUpperCase() + '.' : 'KG.')}
-              </Link>
-
-              <div className="flex flex-wrap justify-center gap-x-12 gap-y-6">
-                {settingsMap.github_link && (
-                  <a href={settingsMap.github_link} target="_blank" rel="noopener noreferrer" className="group flex items-center space-x-2 text-sm font-medium text-muted hover:text-foreground transition-all">
-                    <GithubIcon />
-                    <span>GitHub</span>
-                  </a>
-                )}
-                {settingsMap.linkedin_link && (
-                  <a href={settingsMap.linkedin_link} target="_blank" rel="noopener noreferrer" className="group flex items-center space-x-2 text-sm font-medium text-muted hover:text-foreground transition-all">
-                    <LinkedinIcon />
-                    <span>LinkedIn</span>
-                  </a>
-                )}
-                {settingsMap.twitter_link && (
-                  <a href={settingsMap.twitter_link} target="_blank" rel="noopener noreferrer" className="group flex items-center space-x-2 text-sm font-medium text-muted hover:text-foreground transition-all">
-                    <TwitterIcon />
-                    <span>Twitter</span>
-                  </a>
-                )}
-                <Link href="/blog" className="group flex items-center space-x-2 text-sm font-medium text-muted hover:text-foreground transition-all">
-                  <Globe className="w-4 h-4" />
-                  <span>Blog</span>
-                </Link>
-              </div>
-
-              <div className="flex flex-col items-center space-y-4 pt-8">
-                <div className="w-12 h-[1px] bg-border" />
-                <p className="text-muted/60 text-[10px] uppercase tracking-[0.3em] font-bold">
-                  © {new Date().getFullYear()} Keshav Ghai
-                </p>
-              </div>
-            </div>
-          </div>
-        </footer>
       </ScrollScene>
     </>
   );
