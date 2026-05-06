@@ -22,22 +22,24 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
     };
   }
 
+  const description = post.content.substring(0, 160).replace(/<[^>]*>/g, "");
+
   return {
     title: post.title,
-    description: post.excerpt || post.content.substring(0, 160).replace(/<[^>]*>/g, ""),
+    description,
     openGraph: {
       title: post.title,
-      description: post.excerpt || post.content.substring(0, 160).replace(/<[^>]*>/g, ""),
+      description,
       type: "article",
       publishedTime: post.createdAt.toISOString(),
       authors: ["Keshav Ghai"],
-      images: post.coverImage ? [post.coverImage] : ["/og-image.png"],
+      images: post.imageUrl ? [post.imageUrl] : ["/og-image.png"],
     },
     twitter: {
       card: "summary_large_image",
       title: post.title,
-      description: post.excerpt || post.content.substring(0, 160).replace(/<[^>]*>/g, ""),
-      images: post.coverImage ? [post.coverImage] : ["/og-image.png"],
+      description,
+      images: post.imageUrl ? [post.imageUrl] : ["/og-image.png"],
     },
   };
 }
